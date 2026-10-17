@@ -54,12 +54,18 @@ jobs:
       uses: gradle/actions/setup-gradle@v3
       with:
         gradle-version: '8.7'
+    - name: Debug structure
+      run: |
+        find app-src -maxdepth 3 -type d | head -30
+        find app-src -name "gradlew" | head -5
     - name: Build Release APK
       run: |
-        cd "$APP_SRC_DIR/android"
+        ANDROID_DIR=$(dirname $(find app-src -name "gradlew" | head -1))
+        echo "Android dir: $ANDROID_DIR"
+        cd "$ANDROID_DIR"
         gradle assembleRelease --no-daemon
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: prahari-autofill-apk
-        path: ${{ env.APP_SRC_DIR }}/android/app/build/outputs/apk/release/app-release.apk
+        path: app-src/**/app-release.apk
